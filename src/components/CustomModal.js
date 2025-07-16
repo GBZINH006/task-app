@@ -1,37 +1,17 @@
 // src/components/CustomModal.js
-import React, { useState } from 'react';
-import { Modal, View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { Modal, View, Text, StyleSheet } from 'react-native';
+import CustomButton from './CustomButton';
 import { COLORS } from '../colors';
 
-export default function CustomModal({ visible, onClose, onSave }) {
-    const [input, setInput] = useState('');
-
-    const handleSave = () => {
-        if (input.trim() === '') return;
-        onSave(input.trim());
-        setInput('');
-    };
-
+export default function CustomModal({ visible, message, onCancel, onConfirm }) {
     return (
-        <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
+        <Modal visible={visible} transparent animationType="fade">
             <View style={styles.overlay}>
-                <View style={styles.modalContainer}>
-                    <Text style={styles.title}>Nova Tarefa</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Digite o nome da tarefa"
-                        value={input}
-                        onChangeText={setInput}
-                        autoFocus
-                    />
-                    <View style={styles.buttonsRow}>
-                        <TouchableOpacity style={[styles.btn, styles.cancelBtn]} onPress={() => { setInput(''); onClose(); }}>
-                            <Text style={styles.btnText}>Cancelar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.btn, styles.saveBtn]} onPress={() => { handleSave(); onClose(); }}>
-                            <Text style={styles.btnText}>Adicionar</Text>
-                        </TouchableOpacity>
-                    </View>
+                <View style={styles.container}>
+                    <Text style={styles.message}>{message}</Text>
+                    <CustomButton title="Cancelar" onPress={onCancel} size="small" />
+                    <CustomButton title="Confirmar" onPress={onConfirm} size="small" />
                 </View>
             </View>
         </Modal>
@@ -45,47 +25,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    modalContainer: {
-        backgroundColor: COLORS.white,
+    container: {
         width: '80%',
-        borderRadius: 10,
         padding: 20,
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 15,
-        color: COLORS.textPrimary,
-        textAlign: 'center',
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: COLORS.cardBackground,
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 20,
-        fontSize: 16,
-        color: COLORS.textPrimary,
-    },
-    buttonsRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    btn: {
-        flex: 1,
-        paddingVertical: 10,
-        borderRadius: 8,
-        marginHorizontal: 5,
+        backgroundColor: COLORS.white,
+        borderRadius: 10,
         alignItems: 'center',
     },
-    cancelBtn: {
-        backgroundColor: COLORS.red,
-    },
-    saveBtn: {
-        backgroundColor: COLORS.primary,
-    },
-    btnText: {
-        color: COLORS.white,
-        fontWeight: 'bold',
+    message: {
+        fontSize: 16,
+        color: COLORS.textPrimary,
+        marginBottom: 20,
+        textAlign: 'center',
     },
 });

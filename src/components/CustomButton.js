@@ -1,21 +1,18 @@
+// src/components/CustomButton.js
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../colors';
 
-export default function CustomButton({ title, onPress, size = 'medium', style }) {
+export default function CustomButton({ title, onPress, style, size = 'medium' }) {
     const sizeStyles = {
-        small: { paddingVertical: 6, paddingHorizontal: 12, fontSize: 14 },
-        medium: { paddingVertical: 10, paddingHorizontal: 20, fontSize: 16 },
-        large: { paddingVertical: 14, paddingHorizontal: 30, fontSize: 18 },
+        small: styles.small,
+        medium: styles.medium,
+        large: styles.large,
     };
 
     return (
-        <TouchableOpacity
-            style={[styles.button, style, { paddingVertical: sizeStyles[size].paddingVertical, paddingHorizontal: sizeStyles[size].paddingHorizontal }]}
-            onPress={onPress}
-            activeOpacity={0.7}
-        >
-            <Text style={[styles.text, { fontSize: sizeStyles[size].fontSize }]}>{title}</Text>
+        <TouchableOpacity onPress={onPress} style={[styles.button, sizeStyles[size], style]}>
+            <Text style={styles.text}>{title}</Text>
         </TouchableOpacity>
     );
 }
@@ -25,9 +22,23 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.primary,
         borderRadius: 8,
         alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 8,
     },
     text: {
-        color: COLORS.white,
+        color: '#fff',
         fontWeight: 'bold',
+    },
+    small: {
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+    },
+    medium: {
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+    },
+    large: {
+        paddingVertical: 14,
+        paddingHorizontal: 24,
     },
 });

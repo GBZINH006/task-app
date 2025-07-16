@@ -1,63 +1,81 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import CustomButton from '../components/CustomButton';
-import FloatingButton from '../components/FloatingButton';
+// src/screens/HomeScreen.js
+import React, { useContext, useState } from 'react';
+import {
+    View,
+    FlatList,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+} from 'react-native';
 import CustomModal from '../components/CustomModal';
+import CustomButton from '../components/CustomButton';
+import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../colors';
-
-const initialTasks = [
-    { id: '1', title: 'Estudar React Native' },
-    { id: '2', title: 'Fazer exercício' },
-    { id: '3', title: 'Ler um livro' },
-];
+import { TaskContext } from '../contexts/TaskContext';
 
 export default function HomeScreen() {
-    const [tasks, setTasks] = useState(initialTasks);
+    const { tasks, deleteTask } = useContext(TaskContext);
     const [modalVisible, setModalVisible] = useState(false);
+    const [taskToDelete, setTaskToDelete] = useState(null);
     const navigation = useNavigation();
 
-    const addTask = (title) => {
-        const newTask = {
-            id: (Math.random() * 100000).toFixed(0),
-            title,
-        };
-        setTasks([...tasks, newTask]);
+    const handleDelete = () => {
+        deleteTask(taskToDelete);
+        setModalVisible(false);
     };
 
-    const renderItem = ({ item }) => (
-        <View style={styles.taskContainer}>
-            <Text
-                style={styles.taskText}
-                onPress={() => navigation.navigate('Detalhes da Tarefa', { task: item })}
+    const renderItem = ({ item }) => {
+        // DEBUG: conferir se item é válido
+        console.log('item:', item);
+
+        // validações básicas
+        const title = typeof item.title === 'string' ? item.title : '[Sem título]';
+        const description =
+            typeof item.description === 'string'
+                ? item.description
+                : 'Sem descrição';
+        const duration =
+            typeof item.duration === 'string' ? item.duration : 'Sem duração';
+
+        return (
+            <TouchableOpacity
+                style={styles.taskItem}
+                onPress={() => navigation.navigate('Detalhes', { task: item })}
+                onLongPress={() => {
+                    setTaskToDelete(item.id);
+                    setModalVisible(true);
+                }}
             >
-                {item.title}
-            </Text>
-            <CustomButton
-                title="Excluir"
-                size="small"
-                style={styles.deleteButton}
-                onPress={() => setTasks(tasks.filter(task => task.id !== item.id))}
-            />
-        </View>
-    );
+                <Text style={styles.taskTitle}>{title}</Text>
+                <Text style={styles.taskDesc}>{description}</Text>
+                <Text style={styles.taskDuration}>{duration}</Text>
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Minhas Tarefas</Text>
             <FlatList
                 data={tasks}
-                keyExtractor={item => item.id}
+                keyExtractor={(item) => item.id}
                 renderItem={renderItem}
-                ListEmptyComponent={<Text style={styles.emptyText}>Nenhuma tarefa 😴</Text>}
+                ListEmptyComponent={
+                    <Text style={styles.emptyText}>Nenhuma tarefa adicionada</Text>
+                }
             />
 
-            <FloatingButton onPress={() => setModalVisible(true)} />
+            <CustomButton
+                title="+ Adicionar Tarefa"
+                onPress={() => navigation.navigate('Adicionar')}
+                style={styles.addButton}
+                size="large"
+            />
 
             <CustomModal
                 visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                onSave={addTask}
+                message="Deseja deletar essa tarefa?"
+                onCancel={() => setModalVisible(false)}
+                onConfirm={handleDelete}
             />
         </View>
     );
@@ -69,35 +87,40 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.background,
         padding: 20,
     },
-    header: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: COLORS.textPrimary,
-        textAlign: 'center',
+    taskItem: {
+        backgroundColor: COLORS.white,
+        borderRadius: 12,
+        padding: 20,
+        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 4,
     },
-    taskContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 15,
-        marginBottom: 12,
-        backgroundColor: COLORS.cardBackground,
-        borderRadius: 8,
-    },
-    taskText: {
+    taskTitle: {
         fontSize: 18,
-        color: COLORS.textSecondary,
-        flex: 1,
+        fontWeight: 'bold',
+        color: COLORS.textPrimary,
     },
-    deleteButton: {
-        backgroundColor: COLORS.red,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 5,
+    taskDesc: {
+        fontSize: 14,
+        color: COLORS.textSecondary,
+        marginTop: 6,
+    },
+    taskDuration: {
+        fontSize: 13,
+        color: COLORS.textSecondary,
+        marginTop: 4,
+        fontStyle: 'italic',
     },
     emptyText: {
         textAlign: 'center',
         marginTop: 50,
         color: COLORS.textSecondary,
+        fontSize: 18,
+    },
+    addButton: {
+        marginTop: 20,
+        backgroundColor: 'tomato',
     },
 });
